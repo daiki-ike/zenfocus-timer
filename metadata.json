@@ -1,0 +1,5 @@
+{
+  "name": "ZenFocus Timer",
+  "description": "A streamlined desktop productivity timer with 30m, 45m, and 60m presets, featuring AI-powered focus tips and gentle audio alerts.",
+  "requestFramePermissions": []
+}
