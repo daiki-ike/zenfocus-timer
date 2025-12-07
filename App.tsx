@@ -146,6 +146,7 @@ const App: React.FC = () => {
   // UI State
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [pipWindow, setPipWindow] = useState<Window | null>(null);
+  const [isStandaloneMode, setIsStandaloneMode] = useState<boolean>(false);
 
   // Timer State
   const [timerState, setTimerState] = useState<TimerState>(TimerState.IDLE);
@@ -158,11 +159,21 @@ const App: React.FC = () => {
   // Custom Hooks
   const { playBeep } = useSound();
 
-  // Initialize Notification permission
+  // Initialize Notification permission and check standalone mode
   useEffect(() => {
     if (Notification.permission === 'default') {
       Notification.requestPermission();
     }
+
+    const checkStandalone = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+        (window.navigator as any).standalone === true;
+      setIsStandaloneMode(isStandalone);
+    };
+
+    checkStandalone();
+    window.addEventListener('resize', checkStandalone); // Sometimes display-mode changes on resize/mode switch behavior
+    return () => window.removeEventListener('resize', checkStandalone);
   }, []);
 
   // Timer Logic
@@ -334,7 +345,7 @@ const App: React.FC = () => {
       <div className="w-full max-w-[360px] animate-in slide-in-from-bottom-10 fade-in duration-300 font-sans">
         <TimerView
           {...timerViewProps}
-          onMinimize={() => setIsOpen(false)}
+          onMinimize={isStandaloneMode ? undefined : () => setIsOpen(false)}
         />
       </div>
     </div>
