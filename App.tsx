@@ -304,7 +304,7 @@ const App: React.FC = () => {
   // --- Widget / Minimized View ---
   if (!isOpen) {
     return (
-      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-transparent p-4">
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-950 p-4 overflow-hidden">
         {timerState === TimerState.RUNNING && (
           <div className="bg-slate-900 text-white px-3 py-1 rounded-full text-sm font-mono border border-slate-700 shadow-lg animate-pulse mb-2">
             {formatTime(timeLeft)}
@@ -313,7 +313,7 @@ const App: React.FC = () => {
 
         <button
           onClick={() => setIsOpen(true)}
-          className="w-16 h-16 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 active:scale-95 border-2 border-indigo-400"
+          className="w-16 h-16 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 active:scale-95 border-2 border-indigo-400 z-50"
         >
           {timerState === TimerState.RUNNING ? (
             <div className="relative">
