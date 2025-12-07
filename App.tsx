@@ -304,24 +304,24 @@ const App: React.FC = () => {
   // --- Widget / Minimized View ---
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-transparent p-4">
         {timerState === TimerState.RUNNING && (
-          <div className="bg-slate-900 text-white px-3 py-1 rounded-full text-sm font-mono border border-slate-700 shadow-lg animate-pulse mb-1">
+          <div className="bg-slate-900 text-white px-3 py-1 rounded-full text-sm font-mono border border-slate-700 shadow-lg animate-pulse mb-2">
             {formatTime(timeLeft)}
           </div>
         )}
 
         <button
           onClick={() => setIsOpen(true)}
-          className="w-14 h-14 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 active:scale-95 border-2 border-indigo-400"
+          className="w-16 h-16 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-110 active:scale-95 border-2 border-indigo-400"
         >
           {timerState === TimerState.RUNNING ? (
             <div className="relative">
               <span className="absolute inset-0 rounded-full animate-ping bg-indigo-400 opacity-20"></span>
-              <Maximize2 className="w-6 h-6" />
+              <Maximize2 className="w-8 h-8" />
             </div>
           ) : (
-            <Timer className="w-7 h-7" />
+            <Timer className="w-8 h-8" />
           )}
         </button>
       </div>
