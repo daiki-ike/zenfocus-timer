@@ -49,7 +49,11 @@ const TimerView: React.FC<TimerViewProps> = ({
   };
 
   return (
-    <div className={`flex flex-col relative w-full h-full ${isInPip ? 'bg-slate-950' : 'w-[340px] bg-slate-950/95 backdrop-blur-md border border-slate-800 rounded-3xl shadow-2xl overflow-hidden'}`}>
+    <div className={`flex flex-col relative w-full h-full transition-all duration-300
+      ${isInPip
+        ? 'bg-slate-950'
+        : 'bg-slate-950 sm:bg-slate-950/95 sm:backdrop-blur-md sm:border sm:border-slate-800 sm:rounded-3xl sm:shadow-2xl sm:overflow-hidden'
+      }`}>
 
       {/* Header / Top Bar */}
       <div className="flex items-center justify-between px-5 py-4 bg-slate-900/50 border-b border-slate-800/50 drag-handle">
@@ -325,11 +329,13 @@ const App: React.FC = () => {
 
   // --- Standard View ---
   return (
-    <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-10 fade-in duration-300 font-sans">
-      <TimerView
-        {...timerViewProps}
-        onMinimize={() => setIsOpen(false)}
-      />
+    <div className="fixed inset-0 z-50 flex items-end justify-end pointer-events-none sm:pointer-events-none">
+      <div className="w-full h-full sm:w-[340px] sm:h-auto pointer-events-auto sm:fixed sm:bottom-6 sm:right-6 animate-in slide-in-from-bottom-10 fade-in duration-300 font-sans">
+        <TimerView
+          {...timerViewProps}
+          onMinimize={() => setIsOpen(false)}
+        />
+      </div>
     </div>
   );
 };
