@@ -48,11 +48,12 @@ const TimerView: React.FC<TimerViewProps> = ({
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+
   return (
-    <div className={`flex flex-col relative w-full h-full transition-all duration-300
+    <div className={`flex flex-col relative w-full h-full transition-all duration-300 overflow-hidden
       ${isInPip
         ? 'bg-slate-950'
-        : 'bg-slate-950 sm:bg-slate-950/95 sm:backdrop-blur-md sm:border sm:border-slate-800 sm:rounded-3xl sm:shadow-2xl sm:overflow-hidden'
+        : 'bg-slate-950/95 backdrop-blur-md border border-slate-800 rounded-3xl shadow-2xl'
       }`}>
 
       {/* Header / Top Bar */}
@@ -329,8 +330,8 @@ const App: React.FC = () => {
 
   // --- Standard View ---
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-end pointer-events-none sm:pointer-events-none">
-      <div className="w-full h-full sm:w-[340px] sm:h-auto pointer-events-auto sm:fixed sm:bottom-6 sm:right-6 animate-in slide-in-from-bottom-10 fade-in duration-300 font-sans">
+    <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 p-4">
+      <div className="w-full max-w-[360px] animate-in slide-in-from-bottom-10 fade-in duration-300 font-sans">
         <TimerView
           {...timerViewProps}
           onMinimize={() => setIsOpen(false)}
