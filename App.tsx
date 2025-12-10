@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { TimerState, Preset } from './types';
 import { CircularProgress } from './components/CircularProgress';
 import { Controls } from './components/Controls';
+import { CompactView } from './components/CompactView';
 import { useSound } from './hooks/useSound';
 import { Bell, Maximize2, Minimize2, Timer, PictureInPicture, X } from 'lucide-react';
 
@@ -280,6 +281,31 @@ const App: React.FC = () => {
     }
   }, [pipWindow]);
 
+  // PiP Window Resize Logic
+  const [isPipSmall, setIsPipSmall] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!pipWindow) {
+      setIsPipSmall(false);
+      return;
+    }
+
+    const checkSize = () => {
+      // Threshold for switching to Compact View
+      if (pipWindow.innerWidth < 350 || pipWindow.innerHeight < 350) {
+        setIsPipSmall(true);
+      } else {
+        setIsPipSmall(false);
+      }
+    };
+
+    checkSize(); // Initial check
+    pipWindow.addEventListener('resize', checkSize);
+    return () => {
+      pipWindow.removeEventListener('resize', checkSize);
+    };
+  }, [pipWindow]);
+
   const totalSeconds = selectedMinutes * 60;
   const progress = totalSeconds > 0 ? ((totalSeconds - timeLeft) / totalSeconds) * 100 : 0;
 
@@ -305,8 +331,19 @@ const App: React.FC = () => {
   // Render to PiP Window (Portal)
   const pipPortal = pipWindow
     ? ReactDOM.createPortal(
-      <div className="h-full w-full flex items-center justify-center bg-slate-950 text-slate-100 p-4">
-        <TimerView {...timerViewProps} isInPip={true} />
+      <div className="h-full w-full flex items-center justify-center bg-slate-950 text-slate-100 p-0 overflow-hidden">
+        {isPipSmall ? (
+          <CompactView
+            timerState={timerState}
+            timeLeft={timeLeft}
+            onRestore={() => {
+              togglePip(); // Close PiP on click
+            }}
+            isPip={true}
+          />
+        ) : (
+          <TimerView {...timerViewProps} isInPip={true} />
+        )}
       </div>,
       pipWindow.document.body
     )
@@ -321,42 +358,23 @@ const App: React.FC = () => {
     return (
       <>
         {pipPortal}
+        {/* Main Window Widget */}
         <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-950 p-4 overflow-hidden">
-          {timerState === TimerState.RUNNING && (
-            <div className="bg-slate-900 text-white px-4 py-2 rounded-full text-base font-mono border border-slate-700 shadow-lg animate-pulse mb-6 flex flex-col items-center gap-1">
-              <span className="text-xs text-slate-400 font-sans">REMAINING</span>
-              {formatTime(timeLeft)}
-            </div>
-          )}
-
-          <div className="flex flex-col items-center gap-4">
-            <button
-              onClick={() => {
-                if (pipWindow) {
-                  // If in PiP, clicking this button restores the window (closes PiP)
-                  togglePip();
-                } else {
-                  // Normal restore
-                  setIsOpen(true);
-                }
-              }}
-              className="group relative w-20 h-20 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border-4 border-slate-900 ring-2 ring-indigo-500/50 z-50"
-              title="元に戻す"
-            >
-              {timerState === TimerState.RUNNING ? (
-                <>
-                  <span className="absolute inset-0 rounded-full animate-ping bg-indigo-400 opacity-20"></span>
-                  <Maximize2 className="w-8 h-8 group-hover:scale-110 transition-transform" />
-                </>
-              ) : (
-                <Timer className="w-8 h-8 group-hover:scale-110 transition-transform" />
-              )}
-            </button>
-
-            <p className="text-slate-500 text-sm font-medium animate-pulse">
-              {pipWindow ? 'タイマー分離中' : '最小化中'}
-            </p>
-          </div>
+          <CompactView
+            timerState={timerState}
+            timeLeft={timeLeft}
+            onRestore={() => {
+              if (pipWindow) {
+                togglePip();
+              } else {
+                setIsOpen(true);
+              }
+            }}
+            isPip={false}
+          />
+          <p className="text-slate-500 text-sm font-medium animate-pulse mt-4">
+            {pipWindow ? 'タイマー分離中' : '最小化中'}
+          </p>
         </div>
       </>
     );
