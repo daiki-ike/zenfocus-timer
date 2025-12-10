@@ -154,8 +154,8 @@ const App: React.FC = () => {
   const [selectedMinutes, setSelectedMinutes] = useState<number>(30);
   const [timeLeft, setTimeLeft] = useState<number>(30 * 60);
 
-  // Refs
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Worker Ref
+  const workerRef = useRef<Worker | null>(null);
 
   // Custom Hooks
   const { playBeep } = useSound();
@@ -177,12 +177,14 @@ const App: React.FC = () => {
     return () => window.removeEventListener('resize', checkStandalone);
   }, []);
 
-  // Timer Logic
+  // Initialize Worker
   useEffect(() => {
-    if (timerState === TimerState.RUNNING) {
-      if (timerRef.current) clearInterval(timerRef.current);
+    workerRef.current = new Worker(new URL('./workers/timer.worker.ts', import.meta.url), {
+      type: 'module',
+    });
 
-      timerRef.current = setInterval(() => {
+    workerRef.current.onmessage = (e) => {
+      if (e.data.type === 'TICK') {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             handleFinish();
@@ -190,17 +192,21 @@ const App: React.FC = () => {
           }
           return prev - 1;
         });
-      }, 1000);
-    } else {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
       }
-    }
+    };
 
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      workerRef.current?.terminate();
     };
+  }, []);
+
+  // Timer Logic (Worker Control)
+  useEffect(() => {
+    if (timerState === TimerState.RUNNING) {
+      workerRef.current?.postMessage({ type: 'START' });
+    } else {
+      workerRef.current?.postMessage({ type: 'STOP' });
+    }
   }, [timerState]);
 
   const handleFinish = () => {
